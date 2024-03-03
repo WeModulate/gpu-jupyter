@@ -461,10 +461,20 @@ USER root
 
 # Install useful packages and Graphviz
 RUN apt-get update \
- && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+ && apt-get -y install --no-install-recommends htop apt-utils iputils-ping graphviz libgraphviz-dev openssh-client libatlas-base-dev python-dev-is-python3 gfortran pkg-config libfreetype6-dev hdf5-tools \
+ && apt-get clean && rm -rf /var/lib/apt/lists/* \
+ && wget  http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz \
+ && mv ta-lib-0.4.0-src.tar.gz / \
+ && cd / \
+ && tar -xzf ta-lib-0.4.0-src.tar.gz \
+ && cd ta-lib \
+ && ./configure \
+ && make \
+ && make install \
+ && rm -f /ta-lib-0.4.0-src.tar.gz
 
 USER $NB_UID
+
 RUN set -ex \
  && buildDeps=' \
     graphviz==0.19.1 \
@@ -484,24 +494,97 @@ RUN pip install --no-cache-dir --upgrade \
 
 RUN pip install --no-cache-dir \
     # install extension manager
-    jupyter_contrib_nbextensions==0.7.0 \
-    jupyter_nbextensions_configurator==0.6.1 \
+    jupyter_contrib_nbextensions \
+    jupyter_nbextensions_configurator \
     # install git extension
-    jupyterlab-git==0.41.0 \
+    jupyterlab-git \
     # install plotly extension
-    plotly==5.13.1 \
+    plotly \
     # install drawio and graphical extensions
-    jupyterlab-drawio==0.9.0 \
-    rise==5.7.1 \
-    ipyleaflet==0.17.2 \
-    ipywidgets==8.0.4 \
+    jupyterlab-drawio \
+    rise \
+    ipyleaflet \
     # install spell checker
-    jupyterlab-spellchecker==0.7.3 && \
-    # fix permissions of conda
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
+    jupyterlab-spellchecker \
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}"
 
-# Switch back to jovyan to avoid accidental container runs as root
+RUN pip install --no-cache-dir \
+    # install useful jupyter extensions
+    python-dotenv \
+    jupyter-ai \
+    openai \
+    jupyterlab_code_formatter \
+    jupyterlab-templates \
+    jupyterlab_widgets \
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}"
+
+
+RUN pip install --no-cache-dir \
+    # install quant packages
+    alphalens-reloaded \
+    arch \
+    arcticdb \
+    arviz \
+    bambi \
+    bcolz-zipline \
+    # bcolz-zipline @ git+https://github.com/stefan-jansen/bcolz-zipline.git@main \
+    black \
+    bottleneck \
+    dask \
+    databento \
+    databento-dbn \
+    empyrical \
+    evidently \
+    exchange_calendars \
+    finta \
+    formulae \
+    graphviz \
+    hurst \
+    ib_insync \
+    ipympl \
+    ipywidgets \
+    isort \
+    jedi-language-server \
+    lightgbm \
+    matplotlib \
+    neptune \
+    numba \
+    numexpr \
+    numpy \
+    optuna \
+    openai \
+    pandas \
+    py_vollib \
+    py_vollib_vectorized \
+    pyfolio-reloaded \
+    pykalman \
+    pymc \
+    PyPortfolioOpt \
+    pystore \
+    pytensor \
+    Quandl \
+    quantstats \
+    scikit-learn \
+    scipy \
+    sdepy \
+    seaborn \
+    shap \
+    statsmodels \
+    ta \
+    trading-calendars \ 
+    tzdata \
+    xgboost \
+    ydata-profiling \
+    yellowbrick \
+    yfinance \
+    zipline-reloaded \
+    # fix permissions of conda
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}"
+
+# Switch back to ${NB_UID} to avoid accidental container runs as root
 USER $NB_UID
 
 # Set env-var JUPYTER_TOKEN as static token

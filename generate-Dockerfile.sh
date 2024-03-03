@@ -172,8 +172,12 @@ else
 fi
 
 # Copy the demo notebooks and change permissions
-cp -r extra/Getting_Started data
+cp -r extra/Getting_Started notebooks
+chmod -R 755 notebooks/
+mkdir data
 chmod -R 755 data/
+mkdir db
+chmod -R 755 db/
 
 # set static token (optional if set)
 # copy jupyter server config token addendum to .build
@@ -215,4 +219,5 @@ echo
 echo "The GPU Dockerfile was generated successfully in file ${DOCKERFILE}."
 echo "To start the GPU-based Juyterlab instance, run:"
 echo "  docker build -t gpu-jupyter .build/  # will take a while"
-echo "  docker run --gpus all -d -it -p 8848:8888 -v $(pwd)/data:/home/jovyan/work -e GRANT_SUDO=yes -e JUPYTER_ENABLE_LAB=yes -e NB_UID=$(id -u) -e NB_GID=$(id -g) --user root --restart always --name gpu-jupyter_1 gpu-jupyter"
+echo "  docker compose up"
+# echo "  docker run --gpus all -d -it -p 8848:8888 -v $(pwd)/data:/home/joyvan/work -e GRANT_SUDO=yes -e JUPYTER_ENABLE_LAB=yes -e NB_UID=$(id -u) -e NB_GID=$(id -g) --user root --restart always --name gpu-jupyter_1 gpu-jupyter"

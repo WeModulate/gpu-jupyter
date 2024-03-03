@@ -23,7 +23,10 @@ services:
     ports:
       - 8848:8888
     volumes:
-      - ./data:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./db:/home/jovyan/db
+      - ./work:/home/jovyan/work
+      - /home/jxstanford/QuantShare:/home/jovyan/QuantShare
     environment:
       GRANT_SUDO: "yes"
       JUPYTER_ENABLE_LAB: "yes"
